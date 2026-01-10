@@ -22,6 +22,8 @@ Valid substrings (not all):
 
 Answer:
 "BANC"
+
+Sliding window + freq + invariant
 '''
 
 from collections import defaultdict
