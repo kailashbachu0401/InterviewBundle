@@ -28,6 +28,7 @@ s = "AABABBA"
 k = 1
 
 print(longRepCharReplace(s, k))
+
 '''
 Core Insight:
 

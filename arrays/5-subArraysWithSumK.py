@@ -25,7 +25,7 @@ Translation:
 When you are at position i, to know how many valid subarrays end at i,
 
 you need to know:
-How many times in the past we had a prefix-sum value equal to sum_so_far - k
+How many times in the past we had a prefix-sum value equal to sum_so_far - k (similar to two sum problem)
 
 So the past information we store is:
 
@@ -33,8 +33,6 @@ prefix_sum_value → how many times it has occurred
 '''
 
 from collections import defaultdict
-from unittest import result
-
 
 nums = [1, 2, 1, 2]
 k = 3

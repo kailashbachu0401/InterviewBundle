@@ -1,4 +1,5 @@
 '''
+problem: https://leetcode.com/problems/minimum-window-substring/description/
 You are given two strings:
 
 s → a long string
@@ -41,7 +42,7 @@ def minSubstr(s, t):
 
     required = len(need) # distinct chars of t
     formed = 0 # how many of those chars currently meet the required count
-    #When formed == required, window is valid.
+    # When formed == required, window is valid.
 
     best_len = float(inf)
     best = [-1, -1]

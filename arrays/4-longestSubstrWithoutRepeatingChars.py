@@ -16,6 +16,8 @@ def longestSubstrWithoutRepeatingChars(s):
     max_length = 0
     start = 0
     for end, ch in enumerate(s):
+        # Once window is valid, keep stretching it until the current character is not in the set
+        # When current character is in the set, shrink the window untill it is valid again
         while ch in seen:
             seen.remove(s[start])
             start += 1
@@ -26,12 +28,12 @@ def longestSubstrWithoutRepeatingChars(s):
 print(longestSubstrWithoutRepeatingChars(s))
 
 # Optimized -> Sliding window(always valid) + value -> index memory
-
 def longestSubstrWithoutRepeatingChars(s):
     seen = {} # value -> index
     max_length = 0
     start = 0
     for end, ch in enumerate(s):
+        # Instead of incrementing start by 1 as above, jump directly to last seen pos + 1 of seen character
         if ch in seen and seen[ch] >= start:
             start = seen[ch] + 1
         seen[ch] = end
