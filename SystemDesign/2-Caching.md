@@ -602,3 +602,150 @@ You now understand caching at engineering depth:
 - how Redis fits in
 
 This is way beyond interview-only knowledge.
+
+---
+
+## Single Flight key - concept and skeleton code
+```
+GET /events/E123/metadata
+
+1. Check cache
+2. Miss
+3. Try to acquire lock: lock:event:E123
+4. If lock acquired:
+     - Read DB
+     - Set cache
+     - Release lock
+     - Return
+   Else:
+     - Wait briefly / retry cache
+```
+
+**skeleton code**
+
+```
+def get_event_metadata(event_id):
+    key = f"eventmeta:{event_id}"
+    lock_key = f"lock:{key}"
+
+    value = redis.get(key)
+    if value:
+        return value
+
+    if redis.setnx(lock_key, "1"):
+        redis.expire(lock_key, 2)  # safety TTL
+        try:
+            value = db.fetch(event_id)
+            redis.set(key, value, ex=120)
+            return value
+        finally:
+            redis.delete(lock_key)
+    else:
+        # Someone else is fetching; wait and retry cache
+        sleep(20ms)
+        return redis.get(key) or db.fetch(event_id)
+```
+
+When to mention in interview
+
+Say:
+
+> “We can add single-flight locking on cache miss if we see stampedes on hot keys.”
+
+You don’t need to implement it unless asked.
+
+---
+
+## Run Redis locally with Docker
+```
+docker run --name redis-dev -p 6379:6379 -d redis:7
+```
+
+Check it’s running:
+```
+docker ps
+```
+
+(Optional) open Redis CLI inside container:
+```
+docker exec -it redis-dev redis-cli
+```
+
+Try:
+```
+PING
+# -> PONG
+```
+
+---
+
+## Redis basics you must know (SDE2 level)
+
+Redis is an in-memory key-value store. Common types:
+
+- String (most used)
+- Hash, Set, Sorted Set, List (useful later)
+
+For caching we mostly use String values, often JSON.
+
+Key concepts:
+
+- TTL: key expires automatically
+- Atomic operations: SET NX, INCR are atomic (super important for locks & rate limiting)
+
+---
+
+## Install Python Redis client
+```
+pip install redis
+```
+
+Test connection (Python REPL):
+
+```
+import redis
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+r.ping()  # True
+```
+
+**Important option**
+
+```decode_responses=True``` → you get strings not bytes (simplifies JSON)
+
+---
+
+## Redis commands & terminology (what “setnx” means)
+
+SETNX (Set if Not eXists)
+
+**Old Redis command:**
+
+- ```SETNX key value```
+- returns 1 if it set, 0 if key already exists
+
+**In modern Redis, preferred form is SET with NX:**
+
+- ```SET key value NX EX 2```
+
+Meaning:
+
+- NX = only set if key doesn’t exist
+- EX 2 = expire in 2 seconds
+
+In redis-py, that’s:
+
+```r.set("lock:key", "1", nx=True, ex=2)```
+
+That line is the “setnx + expire” combo in one atomic command.
+
+---
+
+## Rate limiting (Redis INCR + EXPIRE) — terminology + code
+
+Redis INCR key atomically increments an integer value.
+
+Pattern:
+
+- increment counter
+- if it was first increment → set expiry window
+- block if counter exceeds limit

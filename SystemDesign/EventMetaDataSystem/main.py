@@ -1,3 +1,4 @@
+from ast import alias
 from fastapi import FastAPI
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -6,8 +7,17 @@ from fastapi import HTTPException, status, Query, Header
 from typing import Optional, Dict, Any, Tuple, List
 from datetime import datetime, timedelta, timezone
 import base64
+import redis
+import time
+import json
 
 app = FastAPI(title="Event MetaData System", version="0.1.0")
+# Run Redis locally via Docker and uncomment below to use actual Redis
+# Refer caching.md -> Run Redis locally with Docker for more details
+
+# redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
+# RATE_LIMIT = 2
+# WINDOW_SECONDS = 60
 
 # -----------------------------
 # Helpers
@@ -123,13 +133,32 @@ def cache_get(key: str) -> Optional[Dict[str, Any]]:
 
     return response
 
+    # Get from actual Redis
+    # s = redis_client.get(key)
+    # return json.loads(s) if s else None
+
 def cache_set(key: str, response: Dict[str, Any]) -> None:
     now = utc_now()
     CACHE[key] = (response, now + timedelta(seconds = CACHE_TTL_SECONDS))
 
+    # Set to actual Redis
+    # redis_client.set(key, json.dumps(response), ex=CACHE_TTL_SECONDS)
+
 def cache_delete(key: str) -> None:
     CACHE.pop(key, None)
 
+    # Delete from actual Redis
+    # redis_client.delete(key)
+
+# def allow_request(user_id: str) -> None:
+#     bucket = int(time.time() // WINDOW_SECONDS)
+#     key = f"rate:{user_id}:{bucket}"
+
+#     count = redis_client.incr(key)
+#     if count == 1:
+#         redis_client.expire(key, WINDOW_SECONDS)
+#     if count > RATE_LIMIT:
+#         raise HTTPException(status_code = status.HTTP_429_TOO_MANY_REQUESTS, detail = "Rate limit exceeded")
 
 # -----------------------------
 # API
@@ -143,7 +172,16 @@ def health() -> Dict[str, Any]:
     }
 
 @app.get("/v1/events/{event_id}/metadata") # versioning -> v1
-def get_metadata(event_id: str) -> EventMetaDataView:
+def get_metadata(
+    event_id: str,
+    # user_id: str = Header(default = None, alias = "X-User-Id", convert_underscores = False)
+    ) -> EventMetaDataView:
+
+    # Rate limiting with Redis
+
+    # if user_id:
+    #     allow_request(user_id)
+
     # check cache first
     cache_key = f"eventmeta:{event_id}" # incase we wanna store multiple domains in same cache
     cached = cache_get(cache_key)
@@ -157,7 +195,8 @@ def get_metadata(event_id: str) -> EventMetaDataView:
 
     # cache the result
     view = to_view(row)
-    cache_set(cache_key, view.model_dump()) # model_dump() converts to dict
+    # model_dump() converts to dict, json mode converts datetime to ISO string, else redis errors out
+    cache_set(cache_key, view.model_dump(mode = "json"))
     return view
 
 @app.patch("/v1/events/{event_id}/metadata", response_model = EventMetaDataView)

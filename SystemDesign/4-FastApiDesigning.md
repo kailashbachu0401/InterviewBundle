@@ -71,6 +71,10 @@ Now:
    pip install -r requirements.txt
    ```
 
+   Installs
+   - FastAPI and related
+   - Redis
+
 4. **Run the server:**
    ```bash
    uvicorn main:app --reload
@@ -248,3 +252,50 @@ Senior-level takeaway (THIS is what matters)
 Both are correct — choose based on clarity
 
 ---
+
+## Rate limiting – from first principles
+
+What problem does rate limiting solve?
+
+- Prevent abuse
+- Protect downstream systems
+- Ensure fairness
+
+First-principles definition
+
+> Rate limiting limits how often a client can perform an action in a time window.
+
+Simplest mental model
+
+> “Allow at most N requests per key per time window.”
+
+Keys can be:
+
+- user_id
+- API key
+- IP address
+
+**Redis-based rate limiting (core idea)**
+```
+key = rate:{user_id}:{current_minute}
+count = INCR(key)
+if count == 1:
+    EXPIRE key 60
+if count > LIMIT:
+    reject
+```
+
+**Skeleton code**
+```
+def allow_request(user_id):
+    key = f"rate:{user_id}:{current_minute()}"
+    count = redis.incr(key)
+    if count == 1:
+        redis.expire(key, 60)
+    return count <= LIMIT
+```
+Interview-level explanation
+
+> “We use Redis counters with TTL to enforce per-user rate limits.”
+
+That’s enough.
