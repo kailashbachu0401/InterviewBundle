@@ -1734,3 +1734,5 @@ This is the minimum mental foundation of system design.
 Most people never get here — they memorize patterns.
 
 ---
+
+## now start with ReadMe of BackgroundjobProcessingSystem and follow the numbered files.
