@@ -229,6 +229,174 @@ Before sharding, always try:
 
 ---
 
+Example usecase for sharding:
+
+> Blinkit processes millions of orders per seconds, but their DB is stable. They shard orders table based on state: all Delhi orders go to a shard, and similarly Pune, Andhra etc.
+
+This is a location-based shard key.
+
+Let’s analyze why it works and when it doesn’t.
+
+### Why location-based sharding works for Blinkit
+
+Key properties of a good shard key:
+
+- 1️⃣ High cardinality
+    - Many cities / regions
+    - Load spread across shards
+
+- 2️⃣ Write locality
+    -Orders for Delhi mostly accessed together
+    -Inventory checks local
+
+- 3️⃣ Query alignment
+
+    - Most queries are “orders in this city”
+    - Cross-city queries are rare
+
+So:
+```
+shard_key = city_id
+```
+
+is a domain-aligned shard key.
+
+### When this would NOT work
+
+If:
+
+- Delhi generates 10× traffic of other cities
+- One shard becomes a hotspot
+
+Then:
+
+- that shard becomes bottleneck
+- system loses balance
+
+This is called **shard skew**.
+
+---
+
+### Important sharding pitfalls (VERY IMPORTANT)
+
+**❌ Bad shard key: time**
+
+Example:
+```
+shard by day
+```
+
+Why bad:
+
+- “today” shard gets all writes
+- hotspot guaranteed
+
+---
+
+**❌ Bad shard key: low cardinality**
+
+Example:
+```
+shard by country (IN, US)
+```
+
+Too few shards → uneven load.
+
+---
+
+**❌ Bad shard key: frequently queried across shards**
+
+Example:
+```
+shard by user_id
+```
+
+But queries are:
+```
+“all orders today”
+```
+
+Now every query hits all shards.
+
+This defeats sharding.
+
+---
+
+### The 3 questions to decide a shard key (memorize)
+
+Before sharding, always ask:
+
+- What grows the fastest? (writes or data)
+- What do queries look like?
+- Can most queries be answered by ONE shard?
+
+If answer to #3 is “no”, rethink shard key.
+
+---
+
+### Common shard key patterns (real-world)
+
+| Pattern |	Example | When it works |
+| -- | -- | -- |
+Tenant-based | tenant_id |	SaaS apps
+Geography-based |	city_id |	Local services
+User-based |	user_id |	User-centric apps
+Hash-based |	hash(id) |	Uniform load, simple queries
+
+---
+
+### Hash-based sharding (important fallback)
+
+Instead of:
+```
+shard = city_id
+```
+
+You do:
+```
+shard = hash(order_id) % N
+```
+
+**Pros:**
+
+- perfect distribution
+
+**Cons:**
+
+- no locality
+- cross-shard queries common
+
+**Used when:**
+
+- uniform access > locality
+
+---
+
+### Re-sharding (the hard truth)
+
+Re-sharding is:
+
+- expensive
+- risky
+- operationally complex
+
+That’s why:
+
+> You delay sharding until absolutely necessary.
+
+And when you do shard:
+
+- pick shard key carefully
+- think long-term growth
+
+---
+
+### One-line mental model 🔒
+
+> Sharding trades simplicity for scalability — choose shard keys based on query patterns, not intuition.
+
+---
+
 ## Step 9 — Transactions & consistency (important intuition)
 
 ### Single DB
