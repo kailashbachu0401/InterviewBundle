@@ -40,12 +40,12 @@ Change all other characters
 
 Minimum changes needed:
 
-window_length − max_frequency
+window_length - max_frequency
 
 
 Window is valid if:
 
-window_length − maxFreq ≤ k
+window_length - maxFreq ≤ k
 
 What to Track:
 
@@ -63,7 +63,7 @@ Expand window by moving end
 
 Update freq and maxFreq
 
-If (window_length − maxFreq) > k → shrink window from start
+If (window_length - maxFreq) > k → shrink window from start
 
 Update best after shrink loop
 

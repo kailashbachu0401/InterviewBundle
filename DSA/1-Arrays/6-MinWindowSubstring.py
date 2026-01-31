@@ -6,7 +6,7 @@ s → a long string
 
 t → a short string
 
-Your task is to find the smallest continuous part of s (a substring) such that:
+Your task is to find the smallest continuous part of s (substring) such that:
 
 This substring contains all characters of t,
 including atleast their required frequencies.

@@ -1,4 +1,4 @@
-# KailashDSAPackage
+# DSAPackage
 
 DSA package covering all concepts and patterns for interview problem-solving.
 

@@ -4,13 +4,13 @@ You are given an array of integers heights representing the histogram's bar heig
 Return the area of the largest rectangle in the histogram.
 
 Each height can extend left and right until a smaller height appears.
-Area for a height = height × width of its span.
+Area for a height = height x width of its span.
 
 To find the span, we need the previous smaller and next smaller heights.
 When a height is popped from the monotonic stack:
 Next smaller = current index
 Previous smaller = new top of the stack
-So width = (right − 1) − (left + 1) + 1 = right − left − 1.
+So width = (right - 1) - (left + 1) + 1 = right - left - 1.
 
 If heights are monotonically increasing, appending a 0 forces all elements to pop, ensuring every area is computed.
 '''

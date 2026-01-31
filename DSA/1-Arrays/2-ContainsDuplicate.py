@@ -1,5 +1,5 @@
 '''
-You’re scanning numbers. If any number appears more than once → return True, else False.
+You're scanning numbers. If any number appears more than once → return True, else False.
 problem: https://leetcode.com/problems/contains-duplicate/description/
 '''
 
