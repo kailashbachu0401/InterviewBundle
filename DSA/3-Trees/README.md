@@ -7,8 +7,6 @@ We will go in **4 very small steps**:
 - What DFS actually means (without code)
 - The 3 DFS templates (this is the gold)
 
-No rushing.
-
 ---
 
 ## 1️⃣ What is a Tree (forget CS definition)
@@ -447,7 +445,7 @@ When you see a **TREE problem**, ask these **in order**:
 If you follow this checklist:
 
 - You’ll **never go blank** on tree problems
-- Worst case, you’ll be **slightly off** (e.g., Validate BST — very common)
+- Worst case, you’ll be **slightly off**
 - But you’ll **always know where the mistake is**
 
 That’s not luck.

@@ -21,7 +21,7 @@ def canFinish(numCourses, prerequisites):
 
     # start with courses with 0 preqs
     q = deque([i for i in range(numCourses) if preq[i] == 0])
-    taken =0
+    taken = 0
 
     while q:
         course = q.popleft()

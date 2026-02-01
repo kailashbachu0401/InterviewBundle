@@ -14,7 +14,7 @@ Template 1: Compute from children (DFS without backtracking)
 
 Ask each child to compute its maxDepth.
 
-Parent combines the children’s results to get the current node’s maxDepth. (Adds 1 to the max of results.)
+Parent combines the children's results to get the current node's maxDepth. (Adds 1 to the max of results.)
 
 Every child follows the same logic.
 
