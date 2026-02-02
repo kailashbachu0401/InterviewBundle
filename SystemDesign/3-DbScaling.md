@@ -1,7 +1,5 @@
 # 🗄️ DATABASE SCALING — FROM FIRST PRINCIPLES
 
----
-
 ## Step 0 — What a database really does
 
 A database is just a service that:

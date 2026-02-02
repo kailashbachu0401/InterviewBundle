@@ -1,12 +1,10 @@
-# 👁️ OBSERVABILITY — FROM FIRST PRINCIPLES (PHASE C)
-
----
+# 👁️ OBSERVABILITY — FROM FIRST PRINCIPLES
 
 ## Step 0 — The core problem observability solves
 
 Imagine this happens in production:
 
-> “Users are complaining that metadata is slow or wrong.”
+> “Users are complaining that data is slow or wrong.”
 
 Your system is running.
 Nothing is crashed.
@@ -135,7 +133,7 @@ If you only track these four, you’re already strong.
 
 ### Metric examples (EventMetadata service)
 
-- http_requests_total{path="/v1/events/{id}/metadata"}
+- http_requests_total ``{path="/v1/events/{id}/metadata"}``
 - http_request_latency_p95
 - cache_hit_ratio
 - db_query_latency

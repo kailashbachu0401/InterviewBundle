@@ -1,7 +1,5 @@
 # 🔄 CONSISTENCY MODELS — FROM FIRST PRINCIPLES
 
----
-
 ## Step 0 — The uncomfortable truth
 
 In a distributed system, this is unavoidable:
@@ -16,11 +14,11 @@ Once you accept this, consistency models stop feeling scary and start feeling pr
 
 Whenever data is written:
 
-WRITE happens at time T
+-  WRITE happens at time T
 
 Consistency asks:
 
-Who can see this write, and when?
+- Who can see this write, and when?
 
 That’s it. Every consistency model is just a different answer to that question.
 
@@ -56,7 +54,7 @@ But this breaks the moment you add:
 ## Step 3 — Why consistency breaks in real systems
 
 Consider your real architecture:
-
+```
 Client
 ↓
 Service
@@ -64,7 +62,7 @@ Service
 Redis Cache
 ↓
 DB Primary → DB Replica
-
+```
 Now imagine:
 - You update metadata in DB primary
 - Cache invalidation happens
@@ -160,7 +158,7 @@ These are the important ones.
 
 ---
 
-### 1️⃣ Read-Your-Writes (RYW)
+## 1️⃣ Read-Your-Writes (RYW)
 
 If you write something, you should see it on your next read.
 
@@ -179,7 +177,7 @@ RYW is extremely important for user experience.
 
 ---
 
-### 2️⃣ Monotonic Reads
+## 2️⃣ Monotonic Reads
 
 Once you see a new value, you should never see an older one.
 
@@ -191,7 +189,7 @@ This feels broken to users.
 
 ---
 
-### 3️⃣ Writes-Follow-Reads (WFR)
+## 3️⃣ Writes-Follow-Reads (WFR)
 
 If you read a value, then write based on it, the write shouldn’t be lost.
 
@@ -249,7 +247,7 @@ So the system says:
 
 ---
 
-### How systems enforce WFR
+## How systems enforce WFR
 
 Optimistic locking (most common):
 
@@ -403,11 +401,12 @@ Eventual consistency where performance matters.
 Examples:
 
 Area | Consistency
-- Payments | Strong
-- Metadata | Eventual
-- UI read models | Eventual
-- Auth decisions | Strong
-- Caches | Eventual
+ --- | ---------
+Payments | Strong
+Metadata | Eventual
+UI read models | Eventual
+Auth decisions | Strong
+Caches | Eventual
 
 ---
 

@@ -648,12 +648,13 @@ But it’s:
 
 ## SAML vs OAuth (quick comparison)
 
-Aspect | SAML | OAuth / OIDC
-- Format | XML | JSON / JWT
-- Transport | Browser redirects | Browser + API
-- Typical use | Enterprise SSO | Web + mobile + APIs
-- Flexibility | Low | High
-- Popular today | Legacy / Enterprise | Modern default
+| Aspect | SAML | OAuth / OIDC |
+| ------ | ---- | ------------ |
+Format | XML | JSON / JWT |
+Transport | Browser redirects | Browser + API
+Typical use | Enterprise SSO | Web + mobile + APIs
+Flexibility | Low | High
+Popular today | Legacy / Enterprise | Modern default
 
 ---
 
@@ -812,7 +813,7 @@ Never mix the two.
 ---
 
 ## Putting it all together (big picture)
-
+```
 User
 ↓
 CDN
@@ -826,7 +827,7 @@ Service B (auth service A, authorize action)
 Each hop has:
 - its own identity
 - its own trust boundary
-
+```
 ---
 
 ## Final one-sentence takeaway
@@ -1075,13 +1076,14 @@ JWTs are harder to set up, easier to operate at scale.
 
 ## Final comparison (lock this in)
 
-Aspect | API Keys | JWTs
-- Stored in DB | Yes | No
-- Self-contained | No | Yes
-- Expiry | Manual | Built-in
-- Rotation | Hard | Smooth
-- Scale | Limited | Excellent
-- Best for | Simple internal | Modern systems
+| Aspect | API Keys | JWTs |
+| ------ | -------- | ---- |
+Stored in DB | Yes | No
+Self-contained | No | Yes
+Expiry | Manual | Built-in
+Rotation | Hard | Smooth
+Scale | Limited | Excellent
+Best for | Simple internal | Modern systems
 
 ---
 
