@@ -188,7 +188,7 @@ Client → Load Balancer → Service A
 
 ---
 
-## Step 7: Databases
+## Step 7: Databases are not *magic boxes*
 
 *A database is just:*
 
@@ -1747,4 +1747,4 @@ Most people never get here — they memorize patterns.
 
 ---
 
-## now start with ReadMe of BackgroundjobProcessingSystem and follow the numbered files.
+## You are now good to start with BackgroundjobProcessingSystem continue with further concepts of SystemDesign
