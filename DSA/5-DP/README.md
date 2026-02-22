@@ -52,23 +52,20 @@ dp[i] = dp[i-1] + dp[i-2]                // Climbing stairs
 dp[i] = max(dp[i-1], dp[i-2] + nums[i]) // House robber
 ```
 
-### ✅ DP Styles (Only These 2)
-
-**A) Top-Down DP (Memoized Recursion)**
-
-Write recursion first
-
-Add a cache (memo)
-
-Let recursion explore only new states
-
-**B) Bottom-Up DP (Tabulation)**
-
-Build a dp table iteratively
-
-Start from base cases
-
-Fill toward the final answer
 ---
-🧠 Same logic, different direction.
-Choose the style that feels more natural for the problem.
+
+## ✅ DP Styles (Only These 2)
+
+### A) Top-Down DP (Memoized Recursion)
+
+- Write recursion first
+- Add a cache (memo)
+- Let recursion explore only new states
+
+### B) Bottom-Up DP (Tabulation)
+
+- Build a dp table iteratively
+- Start from base cases
+- Fill toward the final answer
+
+> 🧠 Same logic, different direction. Choose the style that feels more natural for the problem.

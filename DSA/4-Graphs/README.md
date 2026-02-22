@@ -9,7 +9,7 @@ Graphs are not scary — they are just Trees + extra rules.
 
 A graph is just:
 
-A set of things (nodes) connected by relationships (edges)
+> A set of things (nodes) connected by relationships (edges)
 
 That’s it.
 
@@ -131,11 +131,13 @@ Key idea:
 - Only addition: visited
 
 ---
+
 ### 🔒 rule (keep it)
 
-BFS: mark visited when enqueuing (prevents duplicates), and distance increments per level
+> BFS: mark visited when enqueuing (prevents duplicates), and distance increments per level
 
-DFS: mark visited as soon as you enter the node (prevents cycles)
+> DFS: mark visited as soon as you enter the node (prevents cycles)
+
 ---
 
 ## 6️⃣ When to use DFS vs BFS (graph intuition)

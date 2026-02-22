@@ -82,7 +82,7 @@ This depends on the question.
 
 ---
 
-## The real invariant (THIS is what matters)
+### The real invariant (THIS is what matters)
 
 While scanning the array:
 

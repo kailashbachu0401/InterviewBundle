@@ -24,8 +24,6 @@ Everything else (APIs, containers, cloud, DevOps) exists only to answer that que
 
 ### ❓ What happens when you run a backend program?
 
-Let’s start extremely concrete.
-
 *You write this code:*
 
 ```
@@ -45,7 +43,6 @@ print("Hello World")
 def hello():
     return "Hello World"
 ```
-
 
 This is not a program that ends.
 
@@ -191,7 +188,7 @@ Client → Load Balancer → Service A
 
 ---
 
-## Step 7: Databases are not “magic boxes”
+## Step 7: Databases
 
 *A database is just:*
 
@@ -252,7 +249,7 @@ A box that bundles code + runtime + dependencies.
 
 ---
 
-### 🔒 Lock this in
+## 🔒 Lock this in
 
 ### 1️⃣ What is state in a service?
 
@@ -321,7 +318,7 @@ because the API depends on in-memory state that you can’t afford to lose.
 
 ---
 
-### Now that you understand state, the next natural questions are:
+## Now that you understand state, the next natural questions are:
 
 * How do services get configured?
 * How do we run the same service in: dev, staging, prod
@@ -339,7 +336,7 @@ Concepts first.
 
 ## Step 10: Configuration (from scratch)
 
-* How does a service know:
+How does a service know:
 * which DB to talk to?
 * which port to listen on?
 * which environment it’s in?
@@ -451,7 +448,7 @@ are taken very seriously in real systems.
 
 ---
 
-### 🚀 Now the next natural step: CONTAINERS (from first principles)
+## 🚀 Now the next natural step: CONTAINERS (from first principles)
 
 Everything you understand so far leads directly to this question:
 
@@ -532,7 +529,7 @@ you restart it, nothing important is lost
 
 ---
 
-### What is DockerFile and DockerCompose File?
+## What is DockerFile and DockerCompose File?
 
 ### 🍱 Real-life analogy: Cooking & Restaurants
 
@@ -544,6 +541,8 @@ You have:
 * ingredients (libraries)
 * cooking tools (runtime)
 * kitchen setup (OS dependencies)
+
+---
 
 ### 🧾 What Git is (important)
 
@@ -568,13 +567,15 @@ If I give you my recipe:
 
 > 👉 Git alone cannot guarantee reproducibility.
 
+---
+
 ### 🧱 What a Dockerfile is (this is the click)
 
 A Dockerfile is the kitchen blueprint + recipe combined.
 
-*It answers:
-*
-“Exactly what kitchen, tools, and ingredients are needed to cook this dish?”
+**It answers:**
+
+> “Exactly what kitchen, tools, and ingredients are needed to cook this dish?”
 
 *Real-life equivalent:*
 
@@ -599,6 +600,8 @@ You say:
 
 This is something Git cannot do.
 
+---
+
 ### ❓ What problem does Dockerfile solve that Git cannot?
 
 >👉 Git tracks source code. Dockerfile defines the execution environment.
@@ -614,6 +617,8 @@ With Dockerfile:
 * reproducible runtime
 * same behavior everywhere
 * fewer production surprises
+
+---
 
 ### 🧩 Now: what is docker-compose? (new analogy)
 
@@ -661,6 +666,8 @@ It’s coordination, not execution.
 | Dockerfile | How to build one service |
 | docker-compose	| How to run many services together |
 
+---
+
 ### 🧠 Back to software (now it clicks)
 
 **Dockerfile defines:**
@@ -693,7 +700,7 @@ In production, orchestration is done by:
 * ECS
 * Nomad
 
-…but the idea is the same.
+but the idea is the same.
 
 ---
 
@@ -781,7 +788,7 @@ This rule alone prevents huge production disasters.
 
 ---
 
-### 🚀 You’ve crossed an important line
+## 🚀 You’ve crossed an important line
 
 At this point, you now understand the WHY behind:
 
@@ -792,7 +799,7 @@ At this point, you now understand the WHY behind:
 
 ---
 
-### Now the next unavoidable questions are:
+## Now the next unavoidable questions are:
 
 * How does a service start and listen for requests?
 * How does traffic reach the container?
@@ -839,7 +846,7 @@ We’ll go step by step.
 
 ---
 
-### 1️⃣ What does it mean for a service to “listen on a port”?
+## 1️⃣ What does it mean for a service to “listen on a port”?
 
 Correct mental model
 
@@ -864,7 +871,7 @@ Client → IP + PORT → Service process → /files handler
 
 ---
 
-### 2️⃣ Why can two containers both listen on port 8080 without conflict?
+## 2️⃣ Why can two containers both listen on port 8080 without conflict?
 
 ### ❌ Not because of GET vs POST
 
@@ -916,7 +923,7 @@ This single sentence explains:
 
 ---
 
-### 3️⃣ Why do we need something outside the container to route traffic?
+## 3️⃣ Why do we need something outside the container to route traffic?
 
 *The real problem*
 
@@ -1023,6 +1030,8 @@ Load Balancer (stable)
   ↓
 Service Instances (unstable)
 ```
+
+> Load Balancer absorbs the chaos containers and provide a stable endpoint to client
 
 This indirection solves:
 
@@ -1149,10 +1158,7 @@ They are NOT:
 * presents a stable contract to clients
 * isolates failures
 
-* “LB also provides traffic distribution”
-
-That’s the secondary benefit.
-The primary benefit is decoupling clients from infrastructure churn.
+> LB Also provides traffic distribution, that’s the secondary benefit. The primary benefit is decoupling clients from infrastructure churn.
 
 ---
 
@@ -1235,11 +1241,13 @@ This one sentence explains:
 
 ---
 
-### 🧩 Let’s now assemble the FULL picture (this is the “aha”)
+## 🧩 Let’s now assemble the FULL picture (this is the “aha”)
 
 You now understand all the pieces. Let’s connect them.
+
+**A REAL cloud service (from scratch)**
+
 ```
-A REAL cloud service (from scratch)
 Client
   ↓
 DNS (stable name)
@@ -1263,6 +1271,7 @@ This is the minimum viable cloud architecture.
 Everything else in system design builds on this.
 
 ---
+
 ## Step 13 — Service-to-Service Communication (from scratch)
 
 *Two fundamental ways services talk*
@@ -1286,7 +1295,10 @@ Characteristics:
 * latency adds up
 * failure propagates
 
+---
+
 ### 🟩 2. Asynchronous communication (fire-and-forget)
+
 ```
 Service A → sends message → queue
 Service B → consumes later
@@ -1437,6 +1449,8 @@ Async helps when:
 * result not needed immediately
 * reliability > latency
 
+> Use Async when you want to de-couple req and processing speed
+
 Example:
 
 * video processing
@@ -1471,7 +1485,7 @@ It’s everywhere.
 
 ---
 
-### 1️⃣ Why can synchronous calls cause cascading failures?
+## 1️⃣ Why can synchronous calls cause cascading failures?
 
 > Synchronous calls tie the availability of the caller to the callee.
 
@@ -1498,7 +1512,7 @@ This is called failure amplification.
 
 ---
 
-### 2️⃣ Why are timeouts necessary even if services are healthy?
+## 2️⃣ Why are timeouts necessary even if services are healthy?
 
 > Timeouts protect your service from waiting forever on someone else’s problems.
 
@@ -1526,7 +1540,7 @@ So timeouts are not about “giving up early” — they are about:
 
 ---
 
-### 3️⃣ Why is idempotency required when retries exist?
+## 3️⃣ Why is idempotency required when retries exist?
 
 > Retries mean the same request may be executed multiple times.
 
@@ -1558,13 +1572,11 @@ This makes:
 
 ---
 
-### 🔗 Now we naturally move to the next building block: QUEUES
-
-Everything you just reasoned about forces queues to exist.
-
----
+## 🔗 Now we naturally move to the next building block: QUEUES
 
 ## Step 20 — Why Queues Exist (from first principles)
+
+Everything you just reasoned about forces queues to exist.
 
 Imagine this:
 
@@ -1718,7 +1730,7 @@ This is the rule of reliable distributed systems.
 
 ---
 
-### 🧠 STOP AND NOTICE SOMETHING IMPORTANT
+## 🧠 STOP AND NOTICE SOMETHING IMPORTANT
 
 You now understand why these things exist, not just what they are:
 

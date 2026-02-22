@@ -138,8 +138,7 @@ f(node) = combine(f(left), f(right))
 
 #### Core idea
 
-“The parent gives me some information.
-I must respect it and pass updated info to my children.”
+> “The parent gives me some information. I must respect it and pass updated info to my children.”
 
 #### Characteristics
 
@@ -178,8 +177,7 @@ I must respect it and pass updated info to my children.”
 
 #### Core idea
 
-“I’m making choices.
-I must undo them when I come back.”
+> “I’m making choices. I must undo them when I come back.”
 
 #### Characteristics
 
