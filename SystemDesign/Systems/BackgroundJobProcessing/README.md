@@ -108,7 +108,6 @@ status (PENDING / RUNNING / DONE / FAILED)
 payload
 attempt_count
 lease_expires_at
-result_location
 last_error
 created_at
 updated_at
@@ -190,17 +189,20 @@ Purpose:
 ## 11 Worker Processing Logic (Correct & Safe)
 
 When worker receives job_id:
-
-* Load job from DB
-* If status = DONE → ACK and exit
-* Try to atomically acquire lease:
-* update status to RUNNING
-* set lease_expires_at = now + lease_duration
-* If lease acquisition fails:
-* another worker owns job
-* do NOT ACK
-* allow message to reappear later
-* Execute job logic
+```
+1 Load job from DB
+2 If status = DONE → ACK and exit
+3 If attempt_count saturated → ACK and exit
+3 Try to atomically acquire lease
+  - update status to RUNNING
+  - set lease_expires_at = now + lease_duration
+  - inc attempt_count by 1
+4 If lease acquisition fails:
+  - another worker owns job
+  - Do NOT ACK
+  - allow message to reappear later
+5 Execute job logic
+```
 
 On success:
 
@@ -267,21 +269,20 @@ Example:
 Idempotency-Key: abc123
 ```
 
-API Idempotency Flow
+**API Idempotency Flow**
 
-* API receives request with idempotency key
+* API receives request with idempotency key in Header
 * Look up key in DB
 * If exists:
-* return stored response
+  - return stored response
 * If not exists:
-* create job
-* store idempotency record
+  - create job
+  - store idempotency record
 * enqueue job
 * return response
 
-Idempotency Table (Minimal)
+**Idempotency Table (Minimal)**
 ```
-idempotency_keys
 key (PK)
 job_id
 response_payload
@@ -295,9 +296,9 @@ Keys are stored with TTL (e.g., 24h).
 
 ## 15 Where Idempotency Lives
 
-API layer: prevents duplicate job creation
+**API layer:** prevents duplicate job creation
 
-Worker layer: prevents duplicate side effects
+**Worker layer:** prevents duplicate side effects
 
 Idempotency is a system property, not a single function.
 
@@ -340,5 +341,14 @@ You now understand:
 * why cloud systems look the way they do
 
 This is real system design, not interview theater.
+
+---
+
+## 20 Takeaways
+
+- Lease/Ownership model
+- Idempotency-Keys
+
+These are standard/common System design features, that are used across multiple real world systems
 
 ---
