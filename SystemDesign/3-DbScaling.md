@@ -452,7 +452,7 @@ This order matters.
 
 ---
 
-## 🧠 One-page DB Scaling Mental Model
+## 🧠 DB Scaling Mental Model
 
 | Problem            | Solution                     |
 |--------------------|------------------------------|
@@ -561,15 +561,11 @@ Consistency tradeoffs come after that decision.
 
 ## 🔗 Applying DB Scaling to a Job System (Real World)
 
-This is the payoff.
-
----
-
 ## Job system DB usage (realistic)
 
 ### Reads
 
-- GET /jobs/{id}
+- `GET /jobs/{id}`
 - polling job status
 - dashboards
 
@@ -600,7 +596,7 @@ That’s a real-world insight.
 
 For job status:
 
-- cache job:{job_id}:status
+- cache `job:{job_id}:status`
 - TTL = short (e.g., 5–10 seconds)
 - invalidate on write
 

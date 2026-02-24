@@ -1,4 +1,4 @@
-# 🧠 Caching From First Principles (Redis)
+# 🧠 Caching From First Principles
 
 ## Step 0 — The real problem caching solves
 
@@ -31,7 +31,7 @@ Expensive work can be:
 - computing something expensive
 - rendering something
 
-So caching is not “Redis-only”. Redis is one possible cache.
+Example possible cache: Redis
 
 ---
 
@@ -68,7 +68,7 @@ Key parts to feel:
 
 ## Step 3 — The most important caching pattern: Cache-Aside
 
-This is the default pattern you’ll see in most backend teams (likely Eventbrite too).
+This is the default pattern you’ll see in most backend teams.
 
 ### Read flow (Cache-Aside)
 
@@ -153,16 +153,11 @@ But TTL has tradeoffs:
 
 ## Step 6 — The hardest part of caching: Invalidation
 
-The famous quote:
-
-> “There are only two hard things in Computer Science: cache invalidation and naming things.”
-
 Invalidate means:
 
 - when DB changes, cache must not serve old value
 
-**Most common strategy:**
-✅ Delete key on write
+**Most common strategy:** ✅ Delete key on write
 
 - next read repopulates from DB
 
@@ -274,20 +269,25 @@ Meaning:
 
 When you introduce caching, decide:
 
-- **Key design**
-  - What’s the key? (`user:{id}`, `event:{id}`, `permissions:{user}:{event}`)
+- **What should be cached**
+  - Read heavy data
+  - Expensive to compute
+  - Data that doesn't change every ms
 
 - **TTL**
   - How stale is acceptable?
 
-- **Invalidation**
-  - On which writes do we delete/update keys?
+- **Key design**
+  - What’s the key? (`user:{id}`, `event:{id}`, `permissions:{user}:{event}`)
+
+- **Invalidation policy**
+  - How or on which writes do we delete/update keys?
 
 - **Failure behavior**
   - If Redis down → fallback to DB? (usually yes)
 
 - **Stampede protection**
-  - lock / jitter / stale-while-revalidate?
+  - single-flight lock / jitter / stale-while-revalidate?
 
 - **Negative caching**
   - cache “not found” briefly?
@@ -313,9 +313,9 @@ So we need guardrails.
 
 Imagine:
 
-- Event E123 is super popular
+- `Event E123` is super popular
 - Redis key event:E123 expires at 10:00:00
-- At 10:00:01 → 10,000 users hit GET /events/E123
+- At 10:00:01 → 10,000 users hit `GET /events/E123`
 
 What happens without protection?
 
@@ -337,7 +337,7 @@ Others should wait.
 **How it feels:**
 
 - Request A sees cache miss
-- Request A acquires lock lock:event:E123
+- Request A acquires lock `lock:event:E123`
 - Request A hits DB and populates cache
 - Request A releases lock
 - Requests B–Z read from cache
@@ -450,7 +450,7 @@ This works when:
 
 One event becomes extremely popular:
 
-- event:E123 gets 90% of traffic
+- **event:E123** gets 90% of traffic
 - Redis CPU/network saturates
 - Even cache becomes bottleneck
 
@@ -460,12 +460,12 @@ One event becomes extremely popular:
 
 Instead of:
 
-- event:E123
+- `event:E123`
 
 Use:
 
-- event:E123:shard1
-- event:E123:shard2
+- `event:E123:shard1`
+- `event:E123:shard2`
 
 Requests randomly choose shard.
 
@@ -561,7 +561,7 @@ Cache:
 
 Requests for non-existent data:
 
-- GET /events/does-not-exist
+- `GET /events/does-not-exist`
 
 Every time:
 
@@ -578,7 +578,7 @@ Attackers can abuse this.
 
 Cache:
 
-- event:does-not-exist → NOT_FOUND (TTL 30s)
+- `event:does-not-exist` → **NOT_FOUND** (TTL 30s)
 
 Now:
 
@@ -587,7 +587,7 @@ Now:
 
 **Feeling:**
 
-“Remember that something doesn’t exist.”
+Remember that something doesn’t exist.
 
 ---
 
@@ -600,8 +600,6 @@ You now understand caching at engineering depth:
 - how to fix failures
 - when to add complexity
 - how Redis fits in
-
-This is way beyond interview-only knowledge.
 
 ---
 
@@ -679,22 +677,6 @@ PING
 
 ---
 
-## Redis basics you must know (SDE2 level)
-
-Redis is an in-memory key-value store. Common types:
-
-- String (most used)
-- Hash, Set, Sorted Set, List (useful later)
-
-For caching we mostly use String values, often JSON.
-
-Key concepts:
-
-- TTL: key expires automatically
-- Atomic operations: SET NX, INCR are atomic (super important for locks & rate limiting)
-
----
-
 ## Install Python Redis client
 ```
 pip install redis
@@ -749,3 +731,21 @@ Pattern:
 - increment counter
 - if it was first increment → set expiry window
 - block if counter exceeds limit
+
+---
+
+## Redis basics you must know (SDE2 level)
+
+Redis is an in-memory key-value store. Common types:
+
+- String (most used)
+- Hash, Set, Sorted Set, List (useful later)
+
+For caching we mostly use String values, often JSON.
+
+Key concepts:
+
+- TTL: key expires automatically
+- Atomic operations: SET NX, INCR are atomic (super important for locks & rate limiting)
+
+---
