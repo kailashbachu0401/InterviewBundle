@@ -612,6 +612,11 @@ Introduce a new version when:
 - field types change
 - behavior changes
 - you remove fields
+- status codes
+- pagination style
+- auth rules
+
+cuz you risk breaking clients
 
 **Example:**
 - v1: ```fraud_risk_level: "LOW"```
@@ -623,7 +628,7 @@ That’s a breaking change → new version.
 
 ### Versioning strategies (quick)
 
-- Path versioning: ```/v1/...``` (most common)
+- Path versioning: `/v1/...`, `/v2/...` (most common)
 - Header versioning: ```Accept: application/vnd...```
 
 ---
@@ -931,9 +936,36 @@ Bad for:
 This is what real production systems use.
 
 Instead of page number, you use a cursor.
-Cursor is just a base64 endoded string, that user sends back blindly if he wants next page
 
-**Example:**
+**What “opaque” means**
+
+Client should treat cursor as a black box:
+
+- not parse it
+- just send it back
+
+**Example cursor contents (conceptually)**
+
+`cursor = base64("2026-01-18T09:10:11Z|E123")`
+
+**First page request**
+
+`GET /events/metadata?limit=50`
+
+Response returns:
+
+- 50 items
+- next_cursor
+
+**Second page request**
+
+`GET /events/metadata?limit=50&cursor=<next_cursor>`
+
+Server decodes cursor and applies:
+
+> “return rows AFTER this position”
+
+**SQL Example:**
 
 *Page 1:*
 
@@ -1163,16 +1195,4 @@ If those 4 are correct → pagination scales to millions of rows.
 
 ---
 
-## API Design Deep Dive — OFFICIALLY CLOSED ✅
-
-You’ve now covered:
-- resources & semantics
-- idempotency
-- pagination
-- versioning
-- ETags
-- rate limiting
-- error contracts
-- retries & consistency
-
-That’s a complete API design toolkit.
+You're now good to implement [EventMetaDataSystem](Systems/EventMetaDataSystem/README.md)

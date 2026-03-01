@@ -1,20 +1,18 @@
 # Event Metadata Service — End-to-End Design (Natural Layering)
 
-> New concepts: versioning, opaque cursor pagination, signal dedupe
-
 ## What problem are we solving?
 
 We want a service that:
 
 - Stores and serves event metadata fast
 - Supports frequent reads (UI, other services)
-- Supports updates/enrichment (fraud flags, computed scores, media info)
+- Supports updates/enrichment (fraud flags, computed scores, etc)
 - Is safe under retries (idempotent writes)
 - Can run background enrichments asynchronously
 
 **What this service is NOT**
 
->It’s not the “source of truth” for the event itself (title, start_time, venue). That lives in the Event service / main DB. This service stores metadata about the event record and related signals.
+>It’s not the “source of truth” for the event itself (title, start_time, venue). That lives in the main DB. This service stores metadata about the event record and related signals.
 
 ---
 
@@ -105,7 +103,7 @@ This is where Redis fits naturally.
 
 For ``` GET /events/{id}/metadata ``` :
 
-- Check Redis: eventmeta:{event_id}
+- Check Redis: `eventmeta:{event_id}`
 - If hit → return
 - If miss → read DB
 - Put into Redis with TTL (e.g., 60–300s)
@@ -144,62 +142,6 @@ So: either “no single-flight initially” or “single-flight only on miss for
 
 ---
 
-## ✅ Opaque cursor pagination (how it actually works)
-
-we need cursor to encode the last position in our sorted order.
-
-```ORDER BY updated_at DESC, event_id DESC```
-
-So the cursor must include BOTH:
-
-- last_updated_at
-- last_event_id
-
-**What “opaque” means**
-
-Client should treat cursor as a black box:
-
-- not parse it
-- just send it back
-
-**Example cursor contents (conceptually)**
-
-```cursor = base64("2026-01-18T09:10:11Z|E123")```
-
-**First page request**
-
-```GET /events/metadata?limit=50```
-
-Response returns:
-
-- 50 items
-- next_cursor
-
-**Second page request**
-
-```GET /events/metadata?limit=50&cursor=<next_cursor>```
-
-Server decodes cursor and applies:
-
-> “return rows AFTER this position”
-
-In SQL-ish logic:
-
-```
-WHERE (updated_at, event_id) < (cursor.updated_at, cursor.event_id)
-ORDER BY updated_at DESC, event_id DESC
-LIMIT 50
-```
-
-That’s it.
-
-**Why this is better than offset pagination**
-
-Offset breaks when rows are inserted/updated between pages.
-Cursor pagination remains consistent.
-
----
-
 ## Write path (correctness first)
 
 For ```PATCH``` / ```POST signals```:
@@ -209,7 +151,7 @@ For ```PATCH``` / ```POST signals```:
 - Validate input
 - Idempotency check (Idempotency-Key)
 - Update DB (transaction)
-- Invalidate cache: DEL eventmeta:{event_id}
+- Invalidate cache: `DEL eventmeta:{event_id}`
 - Return response (200/204)
 
 **Why invalidate (DEL) instead of update cache?**
@@ -284,7 +226,7 @@ This gives you:
 
 **Producer retries update**
 
-- Idempotency-Key prevents double write
+- `Idempotency-Key` prevents double write
 
 **DB slow**
 
@@ -320,58 +262,6 @@ This is a complete, real cloud service.
 
 ---
 
-## Versioning (simple and practical)
-
-> Versioning exists because APIs are **contracts**.
-
-When you change:
-
-- response fields
-- meaning of fields
-- status codes
-- pagination style
-- auth rules
-
-…you risk breaking clients.
-
-So teams create /v2, /v3 so:
-
-- old clients keep working
-- new clients get new behavior
-- migration can happen gradually
-
-**Example of a “breaking change”**
-
-- v2 returns fraud_risk: "HIGH"
-- v3 returns fraud: { "risk_level": "HIGH", "score": 0.92 }
-
-If you changed v2 directly:
-
-- clients parsing string would break
-- So you release v3 while keeping v2.
-
-✅ Versioning is basically “multiple API contracts supported at once”.
-
-Start with:
-
-```/v1/...``` in the path
-
-Most teams do path versioning because it’s obvious.
-
-So you’d have:
-
-```/v1/events/{id}/metadata```
-
-Version when you:
-
-- break response shape
-- change semantics
-- remove fields
-
-Adding fields is usually backwards compatible.
-
----
-
 ## Contracts: status codes and semantics
 
 ```GET /events/{id}/metadata```
@@ -402,8 +292,8 @@ Choose based on implementation.
 
 **Best practice:**
 
-- Idempotency-Key is for API request retries
-- signal_id (or (source, signal_id)) is for domain-level dedupe
+- `Idempotency-Key` is for API request retries
+- signal_id or (source, signal_id) is for domain-level dedupe
 
 Because the fraud pipeline might legitimately send:
 
@@ -426,17 +316,17 @@ And idempotency keys are typically:
 
 **Reads**
 
-- GET /v1/events/{event_id}/metadata
+- `GET /v1/events/{event_id}/metadata`
 
 **Updates (sync)**
 
-- PATCH /v1/events/{event_id}/metadata
-- POST /v1/events/{event_id}/metadata/signals (sync, dedupe via source + signal_id)
+- `PATCH /v1/events/{event_id}/metadata`
+- `POST /v1/events/{event_id}/metadata/signals` (sync, dedupe via source + signal_id)
 
 **Async enrich (job)**
 
-- POST /v1/events/{event_id}/metadata/enrich (202 + job_id, supports Idempotency-Key)
+- `POST /v1/events/{event_id}/metadata/enrich` (202 + job_id, supports Idempotency-Key)
 
 **List (for pagination practice)**
 
-- GET /v1/events/metadata?updated_after=...&limit=...&cursor=...
+- `GET /v1/events/metadata?updated_after=...&limit=...&cursor=...`

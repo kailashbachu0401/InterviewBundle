@@ -1,6 +1,6 @@
 # 🚨 Failure Scenarios Workshop
 
-*(Event Metadata Service)*
+*[Event Metadata Service](Systems/EventMetaDataSystem/README.md)*
 
 We’ll walk through **realistic failures**, one by one, and answer **four questions each time**:
 
@@ -8,8 +8,6 @@ We’ll walk through **realistic failures**, one by one, and answer **four quest
 - What happens immediately?
 - What does the system do?
 - Why correctness is still preserved (or what degrades)
-
-This is how senior engineers think.
 
 ---
 
@@ -20,7 +18,7 @@ Client
   ↓
 Load Balancer
   ↓
-FastAPI (stateless)
+ API (stateless)
   ↓
 Redis (cache, rate limit)
   ↓
@@ -235,7 +233,7 @@ This is why DB is the source of truth.
 
 - Often yes for metadata
 - If not, add:
-    - updated_at precondition
+    - `updated_at` precondition
     - optimistic locking (version column)
 
 ### Senior framing
