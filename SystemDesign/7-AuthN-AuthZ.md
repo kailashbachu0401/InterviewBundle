@@ -645,7 +645,7 @@ JWT are often used in auth systems to carry identity information of a user/servi
 
 - But JWT itself is neutral.
 - It carries claims.
-- Identity is just a type of claim.
+- Identity is just a type of claim. JWT by default doesn't mean identity
 - A token just has to represent seomthing, it doesn't have to be only identity.
 
 ---
@@ -819,7 +819,7 @@ This is called **stateless authentication**.
 
 ---
 
-## Token Vs Auth token Vs OAuth token V Access token
+## Token | Auth token | OAuth token | Access token
 
 Token:
 - Its an umbrella
