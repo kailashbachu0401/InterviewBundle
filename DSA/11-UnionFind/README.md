@@ -105,7 +105,7 @@ Why?
 2. Cycle detection in undirected graph
 3. Redundant connection
 4. Friend circles / groups
-5. Kruskal’s MST (advanced)
+5. Kruskal’s MST
 
 ---
 
