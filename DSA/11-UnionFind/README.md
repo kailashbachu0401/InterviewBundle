@@ -134,6 +134,8 @@ for u, v in edges:
     uf.union(u, v)
 ```
 
+Refer [RedundantConnection.py](./2-RedundantConn.py)
+
 ---
 
 ## 🔒 Mental model
