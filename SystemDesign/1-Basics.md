@@ -859,7 +859,7 @@ So in:
 @app.get("/files")
 ```
 
-* */files* is application-level routing
+* `/files` is application-level routing
 * Port (e.g. 8080) is network-level routing
 
 Two different layers.
