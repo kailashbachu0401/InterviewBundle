@@ -13,6 +13,7 @@ def djikshtras(n, edges, src):
     graph = defaultdict(list)
     for u, v, w in edges:
         graph[u].append((v, w))
+        # if an undirected graoh, append for v too
 
     distances = [float('inf')] * n
 
